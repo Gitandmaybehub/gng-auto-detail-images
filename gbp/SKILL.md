@@ -22,6 +22,7 @@ It runs through the Google API. It never opens a browser and never controls a co
 - Once 40 hours have passed since the last post, it drafts at a different time each day between 9:00 am and 1:30 pm.
 - Its AI (the bot's own model) looks at the photo and writes the post with the rules below, then this folder's checks run on it.
 - Send: posts with that town and photo, then the card changes to "Sent" with the post link.
+- Send too soon (under 40 hours since the last post): his approved text waits and posts itself at the next draft time. The card says when. He gets a Telegram message with the link once it is live.
 - Edit: he fixes the words and sends them back; his text is what posts.
 - Skip, or no tap for a day: nothing posts. A fresh draft comes the next day.
 - Make a card right now: `cd ~/GNG/gng-assistant/gv-bridge && ../.venv/bin/python gbp_post.py now`. Add `--force` for a preview when it is too soon (Send will then be refused by the 40 hour rule).
