@@ -1,6 +1,6 @@
 ---
 name: gng-gbp-autopost
-description: Automatic GNG Auto Detail Google Business Profile post every 2 days, through the Google API only, no browser and no screen control. Picks the next town from gngautodetail.com and the next real job photo, writes one short post in Christian's style, runs safety checks, posts, and confirms it went live. Use for the scheduled cloud routine (Claude Code or Codex), or when asked to run the auto post, the every-2-days Google post, or the town-rotation post.
+description: Every-2-days GNG Auto Detail Google Business Profile post, through the Google API only, no browser and no screen control. Picks the next town from gngautodetail.com and the next real job photo, writes one short post in Christian's style, runs safety checks, and sends it to his Telegram bot (GNGVABot) as a card with Send, Edit, Skip. Nothing posts without his tap. Use when asked about the auto post, the every-2-days Google post, the town-rotation post, or the Google post cards in Telegram.
 ---
 
 # GNG automatic Google post (API, cloud safe)
@@ -12,7 +12,19 @@ Every 2 days, one short post goes up on the GNG Auto Detail Google Business Prof
 - one town from gngautodetail.com, a new town each time,
 - written like Christian writes, and honest.
 
+**Every post waits for Christian's tap.** The draft shows up in his Telegram bot GNGVABot (his phone calls it "Booking Bot") as a card with the photo and three buttons: Send, Edit, Skip. Send posts it. (His ask, 2026-09-28.)
+
 It runs through the Google API. It never opens a browser and never controls a computer.
+
+## How it runs
+
+- The inbox robot on the Mac mini (`com.gng.inbox`) makes the card. Code: `~/GNG/gng-assistant/gv-bridge/gbp_post.py`, called from the loop's chores.
+- Once 40 hours have passed since the last post, it drafts at a different time each day between 9:00 am and 1:30 pm.
+- Its AI (the bot's own model) looks at the photo and writes the post with the rules below, then this folder's checks run on it.
+- Send: posts with that town and photo, then the card changes to "Sent" with the post link.
+- Edit: he fixes the words and sends them back; his text is what posts.
+- Skip, or no tap for a day: nothing posts. A fresh draft comes the next day.
+- Make a card right now: `cd ~/GNG/gng-assistant/gv-bridge && ../.venv/bin/python gbp_post.py now`. Add `--force` for a preview when it is too soon (Send will then be refused by the 40 hour rule).
 
 ## Where things are
 
@@ -38,11 +50,11 @@ Google login: the script reads `GBP_CLIENT_ID`, `GBP_CLIENT_SECRET`, `GBP_REFRES
 5. Write the post using the wording rules below. Use the `town` from the plan.
 6. Dry run: `python3 gbp/autopost.py post --town "<town>" --photo "<photo>" --text "<text>" --dry-run`
 7. If it says NOT POSTED, fix what it lists and dry run again.
-8. Post for real: same command without `--dry-run`.
+8. Never post without Christian's yes. On the Mac mini, run `gbp_post.py now` (above) so he gets the card. Anywhere else, show him the exact text and photo and wait for a yes, then run the command without `--dry-run`.
 9. It waits 20 seconds and prints the post state. `LIVE` or `PROCESSING` is success. On `REJECTED`, cut the likely trigger (a number, a word that could look spammy) and try once more. If it fails again, stop and report it.
 10. Report in 3 lines: the exact text, the town, the photo, and the post link.
 
-Standing permission: Christian asked for this robot to post on its own every 2 days (2026-09-28). No approval step. Only this routine has that permission. Every other one-off post still goes through skill `gng-gbp-posting`, which asks him first.
+No standing permission. Every post needs his tap or his yes (2026-09-28).
 
 ## The wording
 
@@ -121,12 +133,9 @@ Adding a new photo: a real GNG job photo, after shot, no license plate, no faces
 
 Never fall back to a browser from a cloud routine. The browser way is skill `gng-gbp-autopost-browser`, for Grok Bot and OpenMausBot on the Mac only.
 
-## Cloud setup (done once)
+## Cloud routines (paused)
 
-- Claude Code cloud environment `GNG` holds `GBP_CLIENT_ID`, `GBP_CLIENT_SECRET`, `GBP_REFRESH_TOKEN`. The values are in `~/GNG/gng-gbp-auto2/token.json` on the Mac mini (`client_id`, `client_secret`, `refresh_token`).
-- Three Claude Code routines on claude.ai/code/routines, all running this skill, rotate the time of day:
-  - "GNG Google post A": 9:14 am on days 1, 7, 13, 19, 25
-  - "GNG Google post B": 11:47 am on days 3, 9, 15, 21, 27
-  - "GNG Google post C": 1:22 pm on days 5, 11, 17, 23, 29
-  - Times are Eastern summer time. In winter each runs one hour earlier, because routines run on UTC.
-- A Codex cloud task or any other agent can run the same steps. Give it this repo and the same 3 environment values.
+- Three Claude Code cloud routines were made on 2026-09-28 ("GNG Google post A, B, C") and switched off the same day, because he wants to approve every post and only the Mac mini's bot can show him a card. They are safe to delete at claude.ai/code/routines.
+- A cloud run would need `GBP_CLIENT_ID`, `GBP_CLIENT_SECRET`, `GBP_REFRESH_TOKEN` in its environment. None are set.
+
+- Codex or any other agent can use the same steps, but must still get his yes before posting.
