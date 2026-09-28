@@ -24,6 +24,7 @@ It runs through the Google API. It never opens a browser and never controls a co
 - Send: posts with that town and photo, then the card changes to "Sent" with the post link.
 - Send too soon (under 40 hours since the last post): his approved text waits and posts itself at the next draft time. The card says when. He gets a Telegram message with the link once it is live.
 - Edit: he fixes the words and sends them back; his text is what posts.
+- Every Edit teaches it: the bot saves a one-line lesson from his change in `~/GNG/gng-assistant/references/google-posts/LESSONS.md` (separate from the texting lessons) and reads all of them, plus his before and after examples, before every new draft. Any agent writing a GNG post should read that file too.
 - Skip, or no tap for a day: nothing posts. A fresh draft comes the next day.
 - Make a card right now: `cd ~/GNG/gng-assistant/gv-bridge && ../.venv/bin/python gbp_post.py now`. Add `--force` for a preview when it is too soon (Send will then be refused by the 40 hour rule).
 
